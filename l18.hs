@@ -1,4 +1,5 @@
 import Data.Char
+import qualified Data.Map as Map
 
 data Box a = Box a deriving Show
 
@@ -8,7 +9,13 @@ wrap a = Box a
 unwrap :: Box a -> a
 unwrap (Box a) = a
 
+boxMap :: (a -> b) -> Box a -> Box b
+boxMap func (Box a) = Box (func a)
+
 data Triple a = Triple a a a deriving Show
+
+tripleMap :: (a -> b) -> Triple a -> Triple b
+tripleMap func (Triple a b c) = Triple (func a) (func b) (func c)
 
 type Point3D = Triple Double
 
@@ -66,3 +73,29 @@ itemCount3 = ("Pens", 3)
 itemInventory :: [Item]
 itemInventory = [itemCount1, itemCount2, itemCount3]
 
+data Organ = Heart | Brain | Kidney | Spleen deriving (Show, Eq, Ord, Enum)
+
+organs :: [Organ]
+organs = [Heart, Heart, Brain, Spleen, Spleen, Kidney]
+
+ids :: [Int]
+ids = [2,7,13,14,21,24]
+
+organsPairs :: [(Int, Organ)]
+organsPairs = zip ids organs
+
+organCatalog :: Map.Map Int Organ
+organCatalog = Map.fromList organsPairs
+
+values :: [Organ]
+values = map snd (Map.toList organCatalog)
+
+allOrgans :: [Organ]
+allOrgans = [Heart .. Spleen]
+
+organCounts :: [Int]
+organCounts = map countOrgans allOrgans
+                where countOrgans = (\organ -> (length (filter (== organ)  organs)))
+
+organsInventory :: Map.Map Organ Int
+organsInventory  = Map.fromList (zip allOrgans organCounts)
